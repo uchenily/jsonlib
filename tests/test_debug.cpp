@@ -1,9 +1,7 @@
 #include "jsonlib/debug.hpp"
 
-using namespace jsonlib::log;
-
 auto main() -> int {
-    SET_LOG_LEVEL(LogLevel::TRACE);
+    SET_LOG_LEVEL(jsonlib::log::LogLevel::TRACE);
     LOG_TRACE("hello world");
     LOG_DEBUG("hello world");
     LOG_INFO("hello world");
@@ -11,7 +9,7 @@ auto main() -> int {
     LOG_ERROR("hello world");
     LOG_FATAL("hello world");
 
-    SET_LOG_STYLE(LogStyle::BG);
+    SET_LOG_STYLE(jsonlib::log::LogStyle::BG);
     LOG_TRACE("hello world");
     LOG_DEBUG("hello world");
     LOG_INFO("hello world");

@@ -1,5 +1,6 @@
 all_tests_sources = [
   'test_debug.cpp',
+  'test_json.cpp',
 ]
 
 foreach source: all_tests_sources

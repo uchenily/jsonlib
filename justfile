@@ -23,7 +23,7 @@ test-all:
 
 # run a specific test
 test TEST:
-    meson test -C build {{TEST}}
+    meson test -C build {{TEST}} --verbose
 
 # run pre-commit
 pre-commit:

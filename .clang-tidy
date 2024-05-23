@@ -29,6 +29,7 @@ Checks: |
   -readability-magic-numbers,
   -readability-convert-member-functions-to-static,
   -readability-else-after-return,
+  -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   -modernize-use-nodiscard,
 WarningsAsErrors: '*'

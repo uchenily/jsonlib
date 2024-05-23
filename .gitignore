@@ -1,0 +1,12 @@
+.cache
+temp
+build
+a.out
+*.so
+*.pb.*
+__pycache__
+misc/*.sh
+misc/*.md
+subprojects/*
+!subprojects/packagefiles/
+!subprojects/*.wrap

@@ -9,30 +9,32 @@
 namespace jsonlib {
 
 class Json {
+    using array_t = std::vector<Json>;
+    using object_t = std::map<std::string, Json>;
     struct Data {
-        std::shared_ptr<std::map<std::string, Json>> object_;
-        std::shared_ptr<std::vector<Json>>           array_;
-        double                                       number_{};
-        std::string                                  string_;
+        std::shared_ptr<object_t> object_;
+        std::shared_ptr<array_t>  array_;
+        double                    number_{};
+        std::string               string_;
     };
     enum class Type {
-        OBJECT,
-        ARRAY,
-        STRING,
-        NUMBER,
-        TRUE,
-        FALSE,
-        NULL_,
+        Object,
+        Array,
+        String,
+        Number,
+        True,
+        False,
+        Null,
     };
 
     using enum Type;
 
 public:
     Json()
-        : type_{NULL_} {}
+        : type_{Null} {}
 
     Json(bool value)
-        : type_{((value) ? TRUE : FALSE)} {}
+        : type_{((value) ? True : False)} {}
 
     auto operator[](const std::string &key) -> Json & {
         if (!is_object()) {
@@ -46,13 +48,25 @@ public:
         return (*data_.object_)[key];
     }
 
-    auto operator==(bool value) -> bool {
-        if (type_ == TRUE) {
-            return value;
-        } else if (type_ == FALSE) {
-            return !value;
+    auto operator==(const Json &another) const noexcept -> bool {
+        if (this->type_ != another.type_) {
+            return false;
         }
-        return false;
+
+        switch (this->type_) {
+        case Null:
+        case True:
+        case False:
+            return true;
+        case String:
+            return this->data_.string_ == another.data_.string_;
+        case Number:
+            return this->data_.number_ == another.data_.number_; // ?
+        case Array:
+            return *this->data_.array_ == *another.data_.array_;
+        case Object:
+            return *this->data_.object_ == *another.data_.object_;
+        }
     }
 
 public:
@@ -68,54 +82,58 @@ public:
 
 private:
     auto is_object() const noexcept -> bool {
-        return type_ == OBJECT;
+        return type_ == Object;
     }
 
     auto is_array() const noexcept -> bool {
-        return type_ == ARRAY;
+        return type_ == Array;
     }
 
     auto is_string() const noexcept -> bool {
-        return type_ == STRING;
+        return type_ == String;
     }
     auto is_boolean() const noexcept -> bool {
-        return type_ == FALSE || type_ == TRUE;
+        return type_ == False || type_ == True;
     }
 
     auto is_null() const noexcept -> bool {
-        return type_ == NULL_;
+        return type_ == Null;
     };
 
     auto is_number() const noexcept -> bool {
-        return type_ == NUMBER;
+        return type_ == Number;
     }
 
+    // auto to_number() const noexcept -> double {
+    //     return data_.number_;
+    // }
+
     auto create_object() noexcept -> void {
-        type_ = OBJECT;
+        type_ = Object;
         data_.object_ = std::make_shared<std::map<std::string, Json>>();
     }
 
     auto serialize_to(std::ostringstream &out) const -> void {
         switch (type_) {
-        case OBJECT:
+        case Object:
             serialize_object(out);
             break;
-        case ARRAY:
+        case Array:
             serialize_array(out);
             break;
-        case STRING:
+        case String:
             out << '"';
             out << data_.string_;
             out << '"';
             break;
-        case NUMBER:
-        case TRUE:
+        case Number:
+        case True:
             out << "true";
             break;
-        case FALSE:
+        case False:
             out << "false";
             break;
-        case NULL_:
+        case Null:
             out << "null";
             break;
         default:

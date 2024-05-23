@@ -71,6 +71,25 @@ private:
         return type_ == OBJECT;
     }
 
+    auto is_array() const noexcept -> bool {
+        return type_ == ARRAY;
+    }
+
+    auto is_string() const noexcept -> bool {
+        return type_ == STRING;
+    }
+    auto is_boolean() const noexcept -> bool {
+        return type_ == FALSE || type_ == TRUE;
+    }
+
+    auto is_null() const noexcept -> bool {
+        return type_ == NULL_;
+    };
+
+    auto is_number() const noexcept -> bool {
+        return type_ == NUMBER;
+    }
+
     auto create_object() noexcept -> void {
         type_ = OBJECT;
         data_.object_ = std::make_shared<std::map<std::string, Json>>();

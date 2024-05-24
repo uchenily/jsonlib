@@ -10,7 +10,7 @@ Checks: |
   readability-*,
   google-*,
   llvm-*,
-  -cppcoreguidelines-avoid-do-while
+  -cppcoreguidelines-avoid-do-while,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-reference-coroutine-parameters,
   -cppcoreguidelines-special-member-functions,
@@ -29,6 +29,7 @@ Checks: |
   -readability-magic-numbers,
   -readability-convert-member-functions-to-static,
   -readability-else-after-return,
+  -readability-function-cognitive-complexity,
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   -modernize-use-nodiscard,

@@ -9,6 +9,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "jsonlib/debug.hpp"
+
 namespace jsonlib {
 
 class Json {
@@ -149,6 +151,39 @@ class Json {
             }
         }
 
+        // static auto deserialize_from(std::istringstream &in) -> Value {
+        static auto deserialize_from(std::string_view in) -> Value {
+            switch (in[0]) {
+            case 'n':
+                return deserialize_null(in);
+            case 't':
+                return deserialize_true(in);
+            case 'f':
+                return deserialize_false(in);
+            case '-':
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return deserialize_number(in);
+            case '"':
+                return deserialize_string(in);
+            case '[':
+                return deserialize_array(in);
+            case '{':
+                return deserialize_object(in);
+            default:
+                break;
+            }
+            return {};
+        }
+
     private:
         auto serialize_object(std::ostringstream &out) const noexcept -> void {
             auto        n = data_.object_->size();
@@ -179,6 +214,29 @@ class Json {
             }
             out << ']';
         }
+
+        static auto deserialize_null(std::string_view in) -> Value {
+            ASSERT(in.substr(0, 4) == "null");
+            return {};
+        }
+        static auto deserialize_false(std::string_view in) -> Value {
+            return {};
+        }
+        static auto deserialize_true(std::string_view in) -> Value {
+            return {};
+        }
+        static auto deserialize_string(std::string_view in) -> Value {
+            return {};
+        }
+        static auto deserialize_number(std::string_view in) -> Value {
+            return {};
+        }
+        static auto deserialize_array(std::string_view in) -> Value {
+            return {};
+        }
+        static auto deserialize_object(std::string_view in) -> Value {
+            return {};
+        }
     };
 
 public:
@@ -194,6 +252,9 @@ public:
 
     Json(std::initializer_list<Json> values)
         : value_{std::make_shared<Value>(values)} {}
+
+    Json(const Value &value)
+        : value_{std::make_shared<Value>(value)} {}
 
     Json(Json &&other) noexcept
         : value_{std::move(other.value_)} {
@@ -215,10 +276,10 @@ public:
         if (!value_->is<Object>()) {
             value_->to<Object>();
         }
-        auto value = value_->as<Object>()->find(key);
-        if (value != value_->as<Object>()->end()) {
-            return value->second;
-        }
+        // auto value = value_->as<Object>()->find(key);
+        // if (value != value_->as<Object>()->end()) {
+        //     return value->second;
+        // }
 
         return (*value_->as<Object>())[key];
     }
@@ -234,11 +295,19 @@ public:
         return out.str();
     }
 
-    static auto deserialize([[maybe_unused]] std::string_view input) -> Json {
-        // TODO(x)
-        return Json{false};
+    static auto deserialize(const std::string &str) -> Json {
+        if (str.empty()) {
+            return {nullptr};
+        }
+        // std::istringstream in{str};
+        return Value::deserialize_from(str);
     }
 
+    auto number() const {
+        return value_->as<Number>();
+    }
+
+private:
 private:
     std::shared_ptr<Value> value_;
 };

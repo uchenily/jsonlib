@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <string_view>
+#include <type_traits>
 #include <vector>
 
 namespace jsonlib {
@@ -38,6 +40,13 @@ class Json {
 
         Value(bool value)
             : type_{value ? True : False} {}
+
+        template <typename T>
+            requires(std::is_floating_point_v<T> || std::is_integral_v<T>)
+        Value(T value)
+            : type_{Number} {
+            data_.number_ = value;
+        }
 
         auto operator==(const Value &another) const noexcept -> bool {
             if (this->type_ != another.type_) {
@@ -109,6 +118,8 @@ class Json {
                 out << '"';
                 break;
             case Number:
+                out << data_.number_;
+                break;
             case True:
                 out << "true";
                 break;
@@ -159,7 +170,10 @@ public:
     Json([[maybe_unused]] std::nullptr_t null = nullptr)
         : value_{std::make_unique<Value>()} {}
 
-    Json(bool value)
+    template <typename T>
+        requires(std::is_same_v<T, bool> || std::is_floating_point_v<T>
+                 || std::is_integral_v<T>)
+    Json(T value)
         : value_{std::make_unique<Value>(value)} {}
 
     auto operator[](const std::string &key) -> Json & {
@@ -186,6 +200,7 @@ public:
     }
 
     static auto deserialize([[maybe_unused]] std::string_view input) -> Json {
+        // TODO(x)
         return Json{false};
     }
 

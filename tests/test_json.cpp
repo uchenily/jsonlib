@@ -4,7 +4,7 @@
 using namespace jsonlib;
 
 auto main() -> int {
-    SET_LOG_STYLE(jsonlib::log::LogStyle::BG);
+    SET_LOG_STYLE(log::LogStyle::BG);
     Json obj;
     obj["bool"] = true;
     auto ret = obj.serialize();

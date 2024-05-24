@@ -66,33 +66,31 @@ class Json {
         }
 
         template <Type T>
+        auto to() -> void {
+            type_ = T;
+        }
+
+        template <Type T>
         auto as() {
             if constexpr (T == Null) {
-                type_ = Null;
                 return nullptr;
             } else if constexpr (T == False) {
-                type_ = False;
                 return false;
             } else if constexpr (T == True) {
-                type_ = True;
                 return true;
             } else if constexpr (T == Number) {
-                type_ = Number;
                 return data_.number_;
             } else if constexpr (T == String) {
-                type_ = String;
                 return data_.string_;
             } else if constexpr (T == Array) {
                 if (!data_.array_) {
                     data_.array_ = std::make_shared<array_t>();
                 }
-                type_ = Array;
                 return data_.array_;
             } else if constexpr (T == Object) {
                 if (!data_.object_) {
                     data_.object_ = std::make_shared<object_t>();
                 }
-                type_ = Object;
                 return data_.object_;
             }
         }
@@ -165,9 +163,9 @@ public:
         : value_{std::make_unique<Value>(value)} {}
 
     auto operator[](const std::string &key) -> Json & {
-        // if (!value_->is<Object>()) {
-        //     value_->as<Object>();
-        // }
+        if (!value_->is<Object>()) {
+            value_->to<Object>();
+        }
         auto value = value_->as<Object>()->find(key);
         if (value != value_->as<Object>()->end()) {
             return value->second;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <initializer_list>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -53,6 +54,11 @@ class Json {
         Value(T value)
             : type_{String} {
             data_.string_ = value;
+        }
+
+        Value(std::initializer_list<Json> values)
+            : type_{Array} {
+            data_.array_ = std::make_shared<array_t>(values);
         }
 
         auto operator==(const Value &another) const noexcept -> bool {
@@ -162,8 +168,8 @@ class Json {
             auto        n = data_.array_->size();
             std::size_t i{0};
 
+            out << '[';
             for (auto &it : *data_.array_) {
-                out << '[';
                 it.value_->serialize_to(out);
                 if (++i < n) {
                     out << ", ";
@@ -175,14 +181,33 @@ class Json {
 
 public:
     Json([[maybe_unused]] std::nullptr_t null = nullptr)
-        : value_{std::make_unique<Value>()} {}
+        : value_{std::make_shared<Value>()} {}
 
     template <typename T>
         requires(std::is_same_v<T, bool> || std::is_floating_point_v<T>
                  || std::is_integral_v<T>
                  || std::convertible_to<T, std::string_view>)
     Json(T value)
-        : value_{std::make_unique<Value>(value)} {}
+        : value_{std::make_shared<Value>(value)} {}
+
+    Json(std::initializer_list<Json> values)
+        : value_{std::make_shared<Value>(values)} {}
+
+    Json(Json &&other) noexcept
+        : value_{std::move(other.value_)} {
+        other.value_ = nullptr;
+    }
+
+    auto operator=(Json &&other) noexcept -> Json & {
+        if (std::addressof(other) != this) {
+            value_ = std::move(other.value_);
+            other.value_ = nullptr;
+        }
+        return *this;
+    }
+
+    Json(const Json &other) = default;
+    auto operator=(const Json &other) -> Json & = default;
 
     auto operator[](const std::string &key) -> Json & {
         if (!value_->is<Object>()) {
@@ -213,6 +238,6 @@ public:
     }
 
 private:
-    std::unique_ptr<Value> value_;
+    std::shared_ptr<Value> value_;
 };
 } // namespace jsonlib

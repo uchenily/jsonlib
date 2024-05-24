@@ -39,10 +39,30 @@ auto test_string() {
     ASSERT_MSG(ret == R"({"empty": "", "hello": "world"})", "serialize error");
 }
 
+auto test_array() {
+    Json obj;
+    obj["array"] = {"R", "G", "B"};
+    obj["empty"] = {};
+    auto ret = obj.serialize();
+    LOG_INFO("`{}`", ret);
+    ASSERT_MSG(ret == R"({"array": ["R", "G", "B"], "empty": null})",
+               "serialize error");
+}
+
+auto test_array2() {
+    Json obj;
+    obj["array"] = {"string", 100, true};
+    auto ret = obj.serialize();
+    LOG_INFO("`{}`", ret);
+    ASSERT_MSG(ret == R"({"array": ["string", 100, true]})", "serialize error");
+}
+
 auto main() -> int {
     SET_LOG_STYLE(log::LogStyle::BG);
     test_null();
     test_bool();
     test_number();
     test_string();
+    test_array();
+    test_array2();
 }

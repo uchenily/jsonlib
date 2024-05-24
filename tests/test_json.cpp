@@ -57,6 +57,19 @@ auto test_array2() {
     ASSERT_MSG(ret == R"({"array": ["string", 100, true]})", "serialize error");
 }
 
+auto test_object() {
+    Json obj;
+    Json nested_obj1;
+    Json nested_obj2;
+    obj["level1"] = nested_obj1;
+    nested_obj1["level2"] = nested_obj2;
+    nested_obj2["level3"] = Json();
+    auto ret = obj.serialize();
+    LOG_INFO("`{}`", ret);
+    ASSERT_MSG(ret == R"({"level1": {"level2": {"level3": null}}})",
+               "serialize error");
+}
+
 auto main() -> int {
     SET_LOG_STYLE(log::LogStyle::BG);
     test_null();
@@ -65,4 +78,5 @@ auto main() -> int {
     test_string();
     test_array();
     test_array2();
+    test_object();
 }

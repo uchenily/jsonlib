@@ -126,6 +126,8 @@ class Json {
                 serialize_array(out);
                 break;
             case String:
+                // FIXME(x): string may contains special characters, eg. '{',
+                // '"', '[' ...
                 out << '"';
                 out << data_.string_;
                 out << '"';

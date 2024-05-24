@@ -17,7 +17,7 @@ class Json {
         std::shared_ptr<object_t> object_;
         std::shared_ptr<array_t>  array_;
         double                    number_{};
-        std::string               string_;
+        std::string_view          string_;
     };
     enum class Type {
         Object,
@@ -46,6 +46,13 @@ class Json {
         Value(T value)
             : type_{Number} {
             data_.number_ = value;
+        }
+
+        template <typename T>
+            requires(std::is_convertible_v<T, std::string_view>)
+        Value(T value)
+            : type_{String} {
+            data_.string_ = value;
         }
 
         auto operator==(const Value &another) const noexcept -> bool {
@@ -172,7 +179,8 @@ public:
 
     template <typename T>
         requires(std::is_same_v<T, bool> || std::is_floating_point_v<T>
-                 || std::is_integral_v<T>)
+                 || std::is_integral_v<T>
+                 || std::convertible_to<T, std::string_view>)
     Json(T value)
         : value_{std::make_unique<Value>(value)} {}
 

@@ -3,10 +3,29 @@
 
 using namespace jsonlib;
 
-auto main() -> int {
+auto test_null() {
     std::string json_string = "null";
 
     auto obj = Json::deserialize(json_string);
     LOG_INFO("obj.serialize(): {}", obj.serialize());
     ASSERT(json_string == obj.serialize());
+}
+
+auto test_boolean() {
+    std::string json_string = "true";
+
+    auto obj = Json::deserialize(json_string);
+    LOG_INFO("obj.serialize(): {}", obj.serialize());
+    ASSERT(json_string == obj.serialize());
+
+    std::string json_string2 = "false";
+
+    auto obj2 = Json::deserialize(json_string2);
+    LOG_INFO("obj2.serialize(): {}", obj2.serialize());
+    ASSERT(json_string2 == obj2.serialize());
+}
+
+auto main() -> int {
+    test_null();
+    test_boolean();
 }

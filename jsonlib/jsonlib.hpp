@@ -220,10 +220,12 @@ class Json {
             return {};
         }
         static auto deserialize_false(std::string_view in) -> Value {
-            return {};
+            ASSERT(in.substr(0, 5) == "false");
+            return false;
         }
         static auto deserialize_true(std::string_view in) -> Value {
-            return {};
+            ASSERT(in.substr(0, 4) == "true");
+            return true;
         }
         static auto deserialize_string(std::string_view in) -> Value {
             return {};

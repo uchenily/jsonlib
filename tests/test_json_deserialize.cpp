@@ -39,8 +39,17 @@ auto test_number() {
     ASSERT(json_string2 == obj2.serialize());
 }
 
+auto test_string() {
+    std::string json_string = R"("hello world")";
+
+    auto obj = Json::deserialize(json_string);
+    LOG_INFO("obj.serialize(): {}", obj.serialize());
+    ASSERT(json_string == obj.serialize());
+}
+
 auto main() -> int {
     test_null();
     test_boolean();
     test_number();
+    test_string();
 }

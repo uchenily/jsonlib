@@ -228,7 +228,16 @@ class Json {
             return true;
         }
         static auto deserialize_string(std::string_view in) -> Value {
-            return {};
+            auto length = in.length();
+            ASSERT(in[0] == '"');
+            auto pos = 0u;
+            pos++;
+            while (pos < length && in[pos] != '"') {
+                pos++;
+            }
+            ASSERT(in[pos] == '"');
+            pos++;
+            return in.substr(1, pos - 2);
         }
         static auto deserialize_number(std::string_view in) -> Value {
             auto length = in.length();

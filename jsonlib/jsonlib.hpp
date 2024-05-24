@@ -134,7 +134,7 @@ class Json {
                 out << ": ";
                 it.second.value_->serialize_to(out);
                 if (++i < n) {
-                    out << ',';
+                    out << ", ";
                 }
             }
             out << '}';
@@ -148,7 +148,7 @@ class Json {
                 out << '[';
                 it.value_->serialize_to(out);
                 if (++i < n) {
-                    out << ',';
+                    out << ", ";
                 }
             }
             out << ']';
@@ -156,7 +156,7 @@ class Json {
     };
 
 public:
-    Json()
+    Json([[maybe_unused]] std::nullptr_t null = nullptr)
         : value_{std::make_unique<Value>()} {}
 
     Json(bool value)

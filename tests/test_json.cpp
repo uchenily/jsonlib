@@ -3,14 +3,25 @@
 
 using namespace jsonlib;
 
-auto main() -> int {
-    SET_LOG_STYLE(log::LogStyle::BG);
+auto test_null() {
     Json obj;
-    obj["bool"] = true;
+    obj["null"] = nullptr;
     auto ret = obj.serialize();
     LOG_INFO("`{}`", ret);
-    ASSERT_MSG(ret == R"({"bool": true})", "serialize error");
+    ASSERT_MSG(ret == R"({"null": null})", "serialize error");
+}
 
-    // auto obj2 = Json::deserialize(ret);
-    // ASSERT_MSG(obj2["bool"] == true, "deserialize error");
+auto test_bool() {
+    Json obj;
+    obj["bool1"] = true;
+    obj["bool2"] = false;
+    auto ret = obj.serialize();
+    LOG_INFO("`{}`", ret);
+    ASSERT_MSG(ret == R"({"bool1": true, "bool2": false})", "serialize error");
+}
+
+auto main() -> int {
+    SET_LOG_STYLE(log::LogStyle::BG);
+    test_null();
+    test_bool();
 }

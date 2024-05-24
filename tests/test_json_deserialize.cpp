@@ -25,7 +25,22 @@ auto test_boolean() {
     ASSERT(json_string2 == obj2.serialize());
 }
 
+auto test_number() {
+    std::string json_string = "-123";
+
+    auto obj = Json::deserialize(json_string);
+    LOG_INFO("obj.serialize(): {}", obj.serialize());
+    ASSERT(json_string == obj.serialize());
+
+    std::string json_string2 = "3.14";
+
+    auto obj2 = Json::deserialize(json_string2);
+    LOG_INFO("obj2.serialize(): {}", obj2.serialize());
+    ASSERT(json_string2 == obj2.serialize());
+}
+
 auto main() -> int {
     test_null();
     test_boolean();
+    test_number();
 }

@@ -231,7 +231,23 @@ class Json {
             return {};
         }
         static auto deserialize_number(std::string_view in) -> Value {
-            return {};
+            auto length = in.length();
+            // LOG_DEBUG("in `{}` length = {}", in, in.length());
+            auto pos = 0u;
+            if (pos < length && in[pos] == '-') {
+                pos++;
+            }
+            while (pos < length && '0' <= in[pos] && in[pos] <= '9') {
+                pos++;
+            }
+            if (pos < length && in[pos] == '.') {
+                pos++;
+                while (pos < length && '0' <= in[pos] && in[pos] <= '9') {
+                    pos++;
+                }
+                return std::stod(std::string{in.substr(0, pos)});
+            }
+            return std::stoi(std::string{in.substr(0, pos)});
         }
         static auto deserialize_array(std::string_view in) -> Value {
             return {};

@@ -48,12 +48,11 @@ auto test_string() {
 }
 
 auto test_array() {
-    std::string json_string = R"(["R","G","B"])"; // ["R", "G", "B"]
+    std::string json_string = R"(["R", "G", "B"])";
 
     auto obj = Json::deserialize(json_string);
     LOG_INFO("obj.serialize(): {}", obj.serialize());
-    // ASSERT(json_string == obj.serialize());
-    ASSERT(obj.serialize() == R"(["R", "G", "B"])");
+    ASSERT(json_string == obj.serialize());
 }
 
 auto main() -> int {

@@ -186,6 +186,19 @@ class Json {
         }
 
     private:
+        static auto eat_whitespace(std::string_view in, std::size_t &pos) {
+            auto length = in.length();
+            while (pos < length) {
+                switch (in[pos]) {
+                case ' ':
+                case '\r':
+                case '\n':
+                    pos++;
+                default:
+                    return;
+                }
+            }
+        }
         auto serialize_object(std::ostringstream &out) const noexcept -> void {
             auto        n = data_.object_->size();
             std::size_t i{0};
@@ -280,6 +293,7 @@ class Json {
                 if (in[pos] == ',') {
                     pos++;
                 }
+                eat_whitespace(in, pos);
             }
             ASSERT(in[pos] == ']');
             pos++;

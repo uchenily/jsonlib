@@ -306,13 +306,20 @@ class Json {
 
             ASSERT(in[pos] == '{');
             pos++;
-            auto key = deserialize_string(in, pos);
-            ASSERT(in[pos] == ':');
-            pos++;
-            eat_whitespace(in, pos);
-            auto value = deserialize_from(in, pos);
-            (*ret.value_->as<Object>())[std::string{key.value_->data_.string_}]
-                = value;
+            while (in[pos] != '}') {
+                auto key = deserialize_string(in, pos);
+                ASSERT(in[pos] == ':');
+                pos++;
+                eat_whitespace(in, pos);
+                auto value = deserialize_from(in, pos);
+                (*ret.value_
+                      ->as<Object>())[std::string{key.value_->as<String>()}]
+                    = value;
+                if (in[pos] == ',') {
+                    pos++;
+                }
+                eat_whitespace(in, pos);
+            }
 
             return ret;
         }

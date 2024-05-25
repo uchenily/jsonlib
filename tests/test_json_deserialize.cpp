@@ -56,7 +56,7 @@ auto test_array() {
 }
 
 auto test_object() {
-    std::string json_string = R"({"pi": 3.14})";
+    std::string json_string = R"({"pi": 3.14, "rule": {"work": 996}})";
 
     auto obj = Json::deserialize(json_string);
     LOG_INFO("obj.serialize(): {}", obj.serialize());

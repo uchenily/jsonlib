@@ -55,10 +55,19 @@ auto test_array() {
     ASSERT(json_string == obj.serialize());
 }
 
+auto test_object() {
+    std::string json_string = R"({"pi": 3.14})";
+
+    auto obj = Json::deserialize(json_string);
+    LOG_INFO("obj.serialize(): {}", obj.serialize());
+    ASSERT(json_string == obj.serialize());
+}
+
 auto main() -> int {
     test_null();
     test_boolean();
     test_number();
     test_string();
     test_array();
+    test_object();
 }

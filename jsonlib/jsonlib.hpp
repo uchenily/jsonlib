@@ -301,7 +301,20 @@ class Json {
         }
         static auto deserialize_object(std::string_view in, std::size_t &pos)
             -> Json {
-            return {};
+            Json ret;
+            ret.value_->to<Object>();
+
+            ASSERT(in[pos] == '{');
+            pos++;
+            auto key = deserialize_string(in, pos);
+            ASSERT(in[pos] == ':');
+            pos++;
+            eat_whitespace(in, pos);
+            auto value = deserialize_from(in, pos);
+            (*ret.value_->as<Object>())[std::string{key.value_->data_.string_}]
+                = value;
+
+            return ret;
         }
     };
 

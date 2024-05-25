@@ -152,14 +152,15 @@ class Json {
         }
 
         // static auto deserialize_from(std::istringstream &in) -> Json {
-        static auto deserialize_from(std::string_view in) -> Json {
-            switch (in[0]) {
+        static auto deserialize_from(std::string_view in, std::size_t &pos)
+            -> Json {
+            switch (in[pos]) {
             case 'n':
-                return deserialize_null(in);
+                return deserialize_null(in, pos);
             case 't':
-                return deserialize_true(in);
+                return deserialize_true(in, pos);
             case 'f':
-                return deserialize_false(in);
+                return deserialize_false(in, pos);
             case '-':
             case '0':
             case '1':
@@ -171,13 +172,13 @@ class Json {
             case '7':
             case '8':
             case '9':
-                return deserialize_number(in);
+                return deserialize_number(in, pos);
             case '"':
-                return deserialize_string(in);
+                return deserialize_string(in, pos);
             case '[':
-                return deserialize_array(in);
+                return deserialize_array(in, pos);
             case '{':
-                return deserialize_object(in);
+                return deserialize_object(in, pos);
             default:
                 break;
             }
@@ -215,34 +216,41 @@ class Json {
             out << ']';
         }
 
-        static auto deserialize_null(std::string_view in) -> Json {
-            ASSERT(in.substr(0, 4) == "null");
+        static auto deserialize_null(std::string_view in, std::size_t &pos)
+            -> Json {
+            ASSERT(in.substr(pos, 4) == "null");
+            pos += 4;
             return {};
         }
-        static auto deserialize_false(std::string_view in) -> Json {
-            ASSERT(in.substr(0, 5) == "false");
+        static auto deserialize_false(std::string_view in, std::size_t &pos)
+            -> Json {
+            ASSERT(in.substr(pos, 5) == "false");
+            pos += 5;
             return false;
         }
-        static auto deserialize_true(std::string_view in) -> Json {
-            ASSERT(in.substr(0, 4) == "true");
+        static auto deserialize_true(std::string_view in, std::size_t &pos)
+            -> Json {
+            ASSERT(in.substr(pos, 4) == "true");
+            pos += 4;
             return true;
         }
-        static auto deserialize_string(std::string_view in) -> Json {
+        static auto deserialize_string(std::string_view in, std::size_t &pos)
+            -> Json {
+            auto start = pos;
             auto length = in.length();
-            ASSERT(in[0] == '"');
-            auto pos = 0u;
+            ASSERT(in[pos] == '"');
             pos++;
             while (pos < length && in[pos] != '"') {
                 pos++;
             }
             ASSERT(in[pos] == '"');
             pos++;
-            return in.substr(1, pos - 2);
+            return in.substr(start + 1, (pos - start) - 2);
         }
-        static auto deserialize_number(std::string_view in) -> Json {
+        static auto deserialize_number(std::string_view in, std::size_t &pos)
+            -> Json {
+            auto start = pos;
             auto length = in.length();
-            // LOG_DEBUG("in `{}` length = {}", in, in.length());
-            auto pos = 0u;
             if (pos < length && in[pos] == '-') {
                 pos++;
             }
@@ -254,14 +262,16 @@ class Json {
                 while (pos < length && '0' <= in[pos] && in[pos] <= '9') {
                     pos++;
                 }
-                return std::stod(std::string{in.substr(0, pos)});
+                return std::stod(std::string{in.substr(start, pos - start)});
             }
-            return std::stoi(std::string{in.substr(0, pos)});
+            return std::stoi(std::string{in.substr(start, pos - start)});
         }
-        static auto deserialize_array(std::string_view in) -> Json {
+        static auto deserialize_array(std::string_view in, std::size_t &pos)
+            -> Json {
             return {};
         }
-        static auto deserialize_object(std::string_view in) -> Json {
+        static auto deserialize_object(std::string_view in, std::size_t &pos)
+            -> Json {
             return {};
         }
     };
@@ -325,7 +335,8 @@ public:
             return {nullptr};
         }
         // std::istringstream in{str};
-        return Value::deserialize_from(str);
+        std::size_t pos = 0;
+        return Value::deserialize_from(str, pos);
     }
 
     auto number() const {

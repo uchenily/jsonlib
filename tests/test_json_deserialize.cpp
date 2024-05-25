@@ -47,9 +47,19 @@ auto test_string() {
     ASSERT(json_string == obj.serialize());
 }
 
+auto test_array() {
+    std::string json_string = R"(["R","G","B"])"; // ["R", "G", "B"]
+
+    auto obj = Json::deserialize(json_string);
+    LOG_INFO("obj.serialize(): {}", obj.serialize());
+    // ASSERT(json_string == obj.serialize());
+    ASSERT(obj.serialize() == R"(["R", "G", "B"])");
+}
+
 auto main() -> int {
     test_null();
     test_boolean();
     test_number();
     test_string();
+    test_array();
 }

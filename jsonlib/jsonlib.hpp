@@ -268,7 +268,22 @@ class Json {
         }
         static auto deserialize_array(std::string_view in, std::size_t &pos)
             -> Json {
-            return {};
+            Json ret;
+            ret.value_->to<Array>(); // array type
+
+            ASSERT(in[pos] == '[');
+            pos++;
+            while (in[pos] != ']') {
+                // ret.value_->data_.array_->push_back(deserialize_from(in,
+                // pos)); // array may be uninitialized
+                ret.value_->as<Array>()->push_back(deserialize_from(in, pos));
+                if (in[pos] == ',') {
+                    pos++;
+                }
+            }
+            ASSERT(in[pos] == ']');
+            pos++;
+            return ret;
         }
         static auto deserialize_object(std::string_view in, std::size_t &pos)
             -> Json {

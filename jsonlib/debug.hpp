@@ -1,6 +1,6 @@
 #pragma once
 
-#include "jsonlib/log.hpp"
+#include "log.hpp"
 
 static inline auto &debug_logger = jsonlib::log::console;
 

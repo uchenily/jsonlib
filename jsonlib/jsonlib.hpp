@@ -7,21 +7,21 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
-#include "jsonlib/debug.hpp"
+#include "debug.hpp"
 
 namespace jsonlib {
 
 class Json {
     using array_t = std::vector<Json>;
     using object_t = std::map<std::string, Json>;
-    struct Data {
-        std::shared_ptr<object_t> object_;
-        std::shared_ptr<array_t>  array_;
-        double                    number_{};
-        std::string_view          string_;
-    };
+    using Data = std::variant<std::shared_ptr<object_t>,
+                              std::shared_ptr<array_t>,
+                              double,
+                              std::string_view>;
+    // TODO(x): remote type, std::variant<xx> contains `type` info
     enum class Type {
         Object,
         Array,
@@ -47,20 +47,18 @@ class Json {
         template <typename T>
             requires(std::is_floating_point_v<T> || std::is_integral_v<T>)
         Value(T value)
-            : type_{Number} {
-            data_.number_ = value;
-        }
+            : type_{Number}
+            , data_{double(value)} {}
 
         template <typename T>
             requires(std::is_convertible_v<T, std::string_view>)
         Value(T value)
-            : type_{String} {
-            data_.string_ = value;
-        }
+            : type_{String}
+            , data_{std::string_view{value}} {}
 
         Value(std::initializer_list<Json> values)
             : type_{Array} {
-            data_.array_ = std::make_shared<array_t>(values);
+            data_ = std::make_shared<array_t>(values);
         }
 
         auto operator==(const Value &another) const noexcept -> bool {
@@ -74,13 +72,13 @@ class Json {
             case False:
                 return true;
             case String:
-                return this->data_.string_ == another.data_.string_;
+                return this->data_ == another.data_;
             case Number:
-                return this->data_.number_ == another.data_.number_; // ?
+                return this->data_ == another.data_; // ?
             case Array:
-                return *this->data_.array_ == *another.data_.array_;
+                return this->data_ == another.data_;
             case Object:
-                return *this->data_.object_ == *another.data_.object_;
+                return this->data_ == another.data_;
             }
         }
 
@@ -92,6 +90,11 @@ class Json {
         template <Type T>
         auto to() -> void {
             type_ = T;
+            if constexpr (T == Array) {
+                data_ = std::make_shared<array_t>();
+            } else if constexpr (T == Object) {
+                data_ = std::make_shared<object_t>();
+            }
         }
 
         template <Type T>
@@ -103,19 +106,19 @@ class Json {
             } else if constexpr (T == True) {
                 return true;
             } else if constexpr (T == Number) {
-                return data_.number_;
+                return std::get<double>(data_);
             } else if constexpr (T == String) {
-                return data_.string_;
+                return std::get<std::string_view>(data_);
             } else if constexpr (T == Array) {
-                if (!data_.array_) {
-                    data_.array_ = std::make_shared<array_t>();
-                }
-                return data_.array_;
+                // if (!std::get<std::shared_ptr<array_t>>(data_)) {
+                //     data_ = std::make_shared<array_t>();
+                // }
+                return std::get<std::shared_ptr<array_t>>(data_);
             } else if constexpr (T == Object) {
-                if (!data_.object_) {
-                    data_.object_ = std::make_shared<object_t>();
-                }
-                return data_.object_;
+                // if (!std::get<std::shared_ptr<object_t>>(data_)) {
+                //     data_ = std::make_shared<object_t>();
+                // }
+                return std::get<std::shared_ptr<object_t>>(data_);
             }
         }
 
@@ -131,11 +134,11 @@ class Json {
                 // FIXME(x): string may contains special characters, eg. '{',
                 // '"', '[' ...
                 out << '"';
-                out << data_.string_;
+                out << std::get<std::string_view>(data_);
                 out << '"';
                 break;
             case Number:
-                out << data_.number_;
+                out << std::get<double>(data_);
                 break;
             case True:
                 out << "true";
@@ -200,11 +203,11 @@ class Json {
             }
         }
         auto serialize_object(std::ostringstream &out) const noexcept -> void {
-            auto        n = data_.object_->size();
+            auto        n = std::get<std::shared_ptr<object_t>>(data_)->size();
             std::size_t i{0};
 
             out << '{';
-            for (auto &it : *data_.object_) {
+            for (auto &it : *std::get<std::shared_ptr<object_t>>(data_)) {
                 out << '"' << it.first << '"';
                 out << ": ";
                 it.second.value_->serialize_to(out);
@@ -216,11 +219,11 @@ class Json {
         }
 
         auto serialize_array(std::ostringstream &out) const noexcept -> void {
-            auto        n = data_.array_->size();
+            auto        n = std::get<std::shared_ptr<array_t>>(data_)->size();
             std::size_t i{0};
 
             out << '[';
-            for (auto &it : *data_.array_) {
+            for (auto &it : *std::get<std::shared_ptr<array_t>>(data_)) {
                 it.value_->serialize_to(out);
                 if (++i < n) {
                     out << ", ";

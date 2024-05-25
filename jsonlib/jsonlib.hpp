@@ -151,8 +151,8 @@ class Json {
             }
         }
 
-        // static auto deserialize_from(std::istringstream &in) -> Value {
-        static auto deserialize_from(std::string_view in) -> Value {
+        // static auto deserialize_from(std::istringstream &in) -> Json {
+        static auto deserialize_from(std::string_view in) -> Json {
             switch (in[0]) {
             case 'n':
                 return deserialize_null(in);
@@ -215,19 +215,19 @@ class Json {
             out << ']';
         }
 
-        static auto deserialize_null(std::string_view in) -> Value {
+        static auto deserialize_null(std::string_view in) -> Json {
             ASSERT(in.substr(0, 4) == "null");
             return {};
         }
-        static auto deserialize_false(std::string_view in) -> Value {
+        static auto deserialize_false(std::string_view in) -> Json {
             ASSERT(in.substr(0, 5) == "false");
             return false;
         }
-        static auto deserialize_true(std::string_view in) -> Value {
+        static auto deserialize_true(std::string_view in) -> Json {
             ASSERT(in.substr(0, 4) == "true");
             return true;
         }
-        static auto deserialize_string(std::string_view in) -> Value {
+        static auto deserialize_string(std::string_view in) -> Json {
             auto length = in.length();
             ASSERT(in[0] == '"');
             auto pos = 0u;
@@ -239,7 +239,7 @@ class Json {
             pos++;
             return in.substr(1, pos - 2);
         }
-        static auto deserialize_number(std::string_view in) -> Value {
+        static auto deserialize_number(std::string_view in) -> Json {
             auto length = in.length();
             // LOG_DEBUG("in `{}` length = {}", in, in.length());
             auto pos = 0u;
@@ -258,10 +258,10 @@ class Json {
             }
             return std::stoi(std::string{in.substr(0, pos)});
         }
-        static auto deserialize_array(std::string_view in) -> Value {
+        static auto deserialize_array(std::string_view in) -> Json {
             return {};
         }
-        static auto deserialize_object(std::string_view in) -> Value {
+        static auto deserialize_object(std::string_view in) -> Json {
             return {};
         }
     };
@@ -273,15 +273,13 @@ public:
     template <typename T>
         requires(std::is_same_v<T, bool> || std::is_floating_point_v<T>
                  || std::is_integral_v<T>
-                 || std::convertible_to<T, std::string_view>)
+                 || std::convertible_to<T, std::string_view>
+                 || std::is_same_v<T, Value>)
     Json(T value)
         : value_{std::make_shared<Value>(value)} {}
 
     Json(std::initializer_list<Json> values)
         : value_{std::make_shared<Value>(values)} {}
-
-    Json(const Value &value)
-        : value_{std::make_shared<Value>(value)} {}
 
     Json(Json &&other) noexcept
         : value_{std::move(other.value_)} {
@@ -334,7 +332,6 @@ public:
         return value_->as<Number>();
     }
 
-private:
 private:
     std::shared_ptr<Value> value_;
 };

@@ -4,6 +4,8 @@ A simple JSON parsing header library
 
 ## Usage
 
+### serialize
+
 ```cpp
     Json obj;
     obj["null"] = nullptr;
@@ -52,6 +54,14 @@ A simple JSON parsing header library
     nested_obj1["level2"] = nested_obj2;
     nested_obj2["level3"] = Json();
     auto ret = obj.serialize(); // {"level1": {"level2": {"level3": null}}}
+```
+
+### deserialize
+
+```cpp
+    std::string json_string = R"({"pi": 3.14, "rule": {"work": 996}})";
+    auto obj = Json::deserialize(json_string);
+    ASSERT(json_string == obj.serialize());
 ```
 
 ## TODO

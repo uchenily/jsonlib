@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "jsonlib/debug.hpp"
+#include "debug.hpp"
 
 namespace jsonlib {
 

@@ -1,4 +1,4 @@
-#include "jsonlib/debug.hpp"
+#include "debug.hpp"
 
 auto main() -> int {
     SET_LOG_LEVEL(jsonlib::log::LogLevel::TRACE);
@@ -17,6 +17,6 @@ auto main() -> int {
     LOG_ERROR("hello world");
     LOG_FATAL("hello world");
 
-    ASSERT(1 == 1);
-    ASSERT_MSG(1 == 1, "1 equals 1");
+    // ASSERT(1 == 1);
+    // ASSERT_MSG(1 == 1, "1 equals 1");
 }

@@ -9,7 +9,7 @@ project('jsonlib', 'cpp',
 
 compile_args = []
 
-includes = include_directories('.')
+includes = include_directories('jsonlib')
 
 dependencies = []
 

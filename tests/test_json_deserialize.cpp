@@ -1,5 +1,5 @@
-#include "jsonlib/debug.hpp"
-#include "jsonlib/jsonlib.hpp"
+#include "debug.hpp"
+#include "jsonlib.hpp"
 
 using namespace jsonlib;
 

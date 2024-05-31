@@ -128,11 +128,7 @@ class Json {
                 serialize_array(out);
                 break;
             case String:
-                // FIXME(x): string may contains special characters, eg. '{',
-                // '"', '[' ...
-                out << '"';
-                out << data_.string_;
-                out << '"';
+                serialize_string(out);
                 break;
             case Number:
                 out << data_.number_;
@@ -227,6 +223,33 @@ class Json {
                 }
             }
             out << ']';
+        }
+
+        auto serialize_string(std::ostringstream &out) const noexcept -> void {
+            out << '"';
+            auto &input = data_.string_;
+            auto  first = input.begin();
+            for (auto last = input.begin(); last != input.end(); ++last) {
+                switch (*last) {
+                // Simple translations.
+                case '"':
+                case '\\':
+                case '/':
+                case '\b':
+                case '\f':
+                case '\n':
+                case '\r':
+                case '\t':
+                    out << std::string_view{first, last};
+                    out << json_encode[static_cast<unsigned char>(*last)];
+                    first = last + 1;
+
+                default:;
+                    // Default NOP.
+                }
+            }
+            out << std::string_view{first, input.end()};
+            out << '"';
         }
 
         static auto deserialize_null(std::string_view in, std::size_t &pos)

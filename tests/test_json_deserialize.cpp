@@ -63,6 +63,14 @@ auto test_object() {
     ASSERT(json_string == obj.serialize());
 }
 
+auto test_utf8() {
+    std::string json_string = R"({"\u4f60\u597d": "\u4e16\u754c"})";
+
+    auto obj = Json::deserialize(json_string);
+    LOG_INFO("obj.serialize(): {}", obj.serialize());
+    ASSERT(R"({"你好": "世界"})" == obj.serialize());
+}
+
 auto main() -> int {
     test_null();
     test_boolean();
@@ -70,4 +78,5 @@ auto main() -> int {
     test_string();
     test_array();
     test_object();
+    test_utf8();
 }

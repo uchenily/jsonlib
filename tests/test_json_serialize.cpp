@@ -70,6 +70,17 @@ auto test_object() {
                "serialize error");
 }
 
+auto test_utf8() {
+    Json obj;
+    // {"你好": "世界"}
+    // obj["你好"] = "世界";
+    // {"\u4f60\u597d": "\u4e16\u754c"}
+    obj["\\u4f60\\u597d"] = "\\u4e16\\u754c";
+    auto ret = obj.serialize();
+    LOG_INFO("`{}`", ret);
+    // ASSERT_MSG(ret == R"({"你好": "世界"})", "serialize error");
+}
+
 auto main() -> int {
     SET_LOG_STYLE(log::LogStyle::BG);
     test_null();
@@ -79,4 +90,5 @@ auto main() -> int {
     test_array();
     test_array2();
     test_object();
+    test_utf8();
 }

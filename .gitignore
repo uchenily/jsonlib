@@ -5,6 +5,7 @@ a.out
 *.so
 *.pb.*
 __pycache__
+.gdb_history
 misc/*.sh
 misc/*.md
 subprojects/*

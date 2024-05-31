@@ -39,6 +39,15 @@ auto test_string() {
     ASSERT_MSG(ret == R"({"empty": "", "hello": "world"})", "serialize error");
 }
 
+auto test_string_with_escaped_char() {
+    Json obj;
+    obj["with-escaped-char"] = R"(hello" hello\t hello\r hello\n)";
+    auto ret = obj.serialize();
+    LOG_INFO("`{}`", ret);
+    ASSERT(ret
+           == R"({"with-escaped-char": "hello\" hello\\t hello\\r hello\\n"})");
+}
+
 auto test_array() {
     Json obj;
     obj["array"] = {"R", "G", "B"};
@@ -76,6 +85,7 @@ auto main() -> int {
     test_bool();
     test_number();
     test_string();
+    test_string_with_escaped_char();
     test_array();
     test_array2();
     test_object();

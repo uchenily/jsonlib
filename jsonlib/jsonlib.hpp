@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "debug.hpp"
+#include "json_encode.hpp"
 
 namespace jsonlib {
 
@@ -241,7 +242,7 @@ class Json {
                 case '\r':
                 case '\t':
                     out << std::string_view{first, last};
-                    out << json_encode[static_cast<unsigned char>(*last)];
+                    out << json_encode.at(static_cast<unsigned char>(*last));
                     first = last + 1;
 
                 default:;

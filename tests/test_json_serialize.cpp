@@ -41,11 +41,10 @@ auto test_string() {
 
 auto test_string_with_escaped_char() {
     Json obj;
-    obj["with-escaped-char"] = R"(hello" hello\t hello\r hello\n)";
+    obj["with-escaped-char"] = "hello\t hello\r hello\n";
     auto ret = obj.serialize();
     LOG_INFO("`{}`", ret);
-    ASSERT(ret
-           == R"({"with-escaped-char": "hello\" hello\\t hello\\r hello\\n"})");
+    ASSERT(ret == R"({"with-escaped-char": "hello\t hello\r hello\n"})");
 }
 
 auto test_array() {

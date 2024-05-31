@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <sstream>
 #include <string_view>
 
 inline const std::array<std::string_view, 256> json_encode
@@ -33,3 +34,56 @@ inline const std::array<std::string_view, 256> json_encode
        "\xea", "\xeb", "\xec", "\xed", "\xee", "\xef", "\xf0", "\xf1", "\xf2",
        "\xf3", "\xf4", "\xf5", "\xf6", "\xf7", "\xf8", "\xf9", "\xfa", "\xfb",
        "\xfc", "\xfd", "\xfe", "\xff"};
+
+inline auto json_decode(std::string_view input) -> std::string {
+    std::ostringstream out;
+
+    std::size_t pos = 0;
+    while (pos < input.length()) {
+        if (input[pos] == '\\') {
+            ++pos;
+            switch (input[pos]) {
+            // Simple translations.
+            case '"':
+                out << '"';
+                break;
+            case '\\':
+                out << '\\';
+                break;
+            case '/':
+                out << '/';
+                break;
+            case 'b':
+                out << '\b';
+                break;
+            case 'f':
+                out << '\f';
+                break;
+            case 'n':
+                out << '\n';
+                break;
+            case 'r':
+                out << '\r';
+                break;
+            case 't':
+                out << '\t';
+                break;
+
+            // If it is an unrecognized sequence, do nothing.
+            default:
+                out << '\\';
+                out << input[pos];
+                break;
+            }
+            ++pos;
+        } else {
+            size_t next_backslash = input.find('\\', pos);
+            if (next_backslash == std::string_view::npos) {
+                next_backslash = input.length();
+            }
+            out << std::string_view{input.data() + pos, next_backslash - pos};
+            pos = next_backslash;
+        }
+    }
+    return out.str();
+}

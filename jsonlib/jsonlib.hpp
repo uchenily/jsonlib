@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "debug.hpp"
-#include "json_encode.hpp"
+#include "json_codec.hpp"
 
 namespace jsonlib {
 
@@ -21,7 +21,7 @@ class Json {
         std::shared_ptr<object_t> object_;
         std::shared_ptr<array_t>  array_;
         double                    number_{};
-        std::string_view          string_;
+        std::string               string_;
     };
     enum class Type {
         Object,
@@ -282,7 +282,8 @@ class Json {
             }
             ASSERT(in[pos] == '"');
             pos++;
-            return in.substr(start + 1, (pos - start) - 2);
+            return json_decode(
+                std::string_view{in.data() + start + 1, in.data() + pos - 1});
         }
         static auto deserialize_number(std::string_view in, std::size_t &pos)
             -> Json {
@@ -414,6 +415,10 @@ public:
 
     auto number() const {
         return value_->as<Number>();
+    }
+
+    auto string() const {
+        return value_->as<String>();
     }
 
 private:

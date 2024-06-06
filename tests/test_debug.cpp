@@ -1,7 +1,7 @@
 #include "debug.hpp"
 
 auto main() -> int {
-    SET_LOG_LEVEL(jsonlib::log::LogLevel::TRACE);
+    SET_LOG_LEVEL(print_hpp::log::LogLevel::TRACE);
     LOG_TRACE("hello world");
     LOG_DEBUG("hello world");
     LOG_INFO("hello world");
@@ -9,7 +9,7 @@ auto main() -> int {
     LOG_ERROR("hello world");
     LOG_FATAL("hello world");
 
-    SET_LOG_STYLE(jsonlib::log::LogStyle::BG);
+    SET_LOG_STYLE(print_hpp::log::LogStyle::BG);
     LOG_TRACE("hello world");
     LOG_DEBUG("hello world");
     LOG_INFO("hello world");

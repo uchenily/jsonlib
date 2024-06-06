@@ -79,7 +79,7 @@ auto test_object() {
 }
 
 auto main() -> int {
-    SET_LOG_STYLE(log::LogStyle::BG);
+    SET_LOG_STYLE(print_hpp::log::LogStyle::BG);
     test_null();
     test_bool();
     test_number();

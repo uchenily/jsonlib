@@ -8,7 +8,7 @@
 #include <span>
 #include <string_view>
 
-namespace jsonlib::log {
+namespace print_hpp::log {
 
 enum class LogLevel {
     TRACE,
@@ -95,6 +95,15 @@ namespace detail {
             return to_color_bg(level);
         default:
             return "";
+        }
+    }
+
+    template <LogLevel Level>
+    auto function_name(std::source_location loc) noexcept -> std::string {
+        if constexpr (Level <= LogLevel::DEBUG) {
+            return std::format("|{}|", loc.function_name());
+        } else {
+            return {};
         }
     }
 
@@ -210,6 +219,12 @@ namespace detail {
             log<LogLevel::FATAL>(fwsl, std::forward<Args>(args)...);
         }
 
+        template <typename Fmt, typename... Args>
+            requires std::constructible_from<std::string_view, Fmt>
+        auto printf(Fmt fmt, Args... args) {
+            std::clog << std::vformat(fmt, std::make_format_args(args...));
+        }
+
         auto set_level(LogLevel level) {
             level_ = level;
         }
@@ -228,7 +243,7 @@ namespace detail {
             auto source_location = fwsl.source_location();
             auto message = std::vformat(fmt, std::make_format_args(args...));
             auto now = std::chrono::system_clock::now();
-            std::clog << std::format("{} |{}{:<5}{}| {}{}:{}{} {}\n",
+            std::clog << std::format("{} |{}{:<5}{}| {}{}:{}{}{} {}\n",
                                      get_timestamp(now),
                                      to_color(Level, style_),
                                      to_string(Level),
@@ -236,6 +251,7 @@ namespace detail {
                                      source_color(),
                                      source_location.file_name(),
                                      source_location.line(),
+                                     function_name<Level>(source_location),
                                      reset_color(),
                                      message);
         }
@@ -248,5 +264,4 @@ namespace detail {
 } // namespace detail
 
 inline auto console = detail::ConsoleLogger();
-
-} // namespace jsonlib::log
+} // namespace print_hpp::log

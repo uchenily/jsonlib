@@ -1,6 +1,7 @@
 #pragma once
 
-#include "log.hpp"
+#include "jsonlib/log.hpp"
+#include "jsonlib/print.hpp"
 
 inline auto &debug_logger = print_hpp::log::console;
 

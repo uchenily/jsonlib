@@ -29,6 +29,10 @@ test TEST:
 pre-commit:
     pre-commit run -a
 
+# run run-clang-tidy on specific file
+clang-fix FILE:
+    run-clang-tidy -fix -p build {{FILE}}
+
 # install(dry-run)
 dry-run:
     meson install -C build --no-rebuild --only-changed --dry-run

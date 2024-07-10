@@ -9,8 +9,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "debug.hpp"
-#include "json_codec.hpp"
+#include "jsonlib/debug.hpp"
+#include "jsonlib/json_codec.hpp"
 
 namespace jsonlib {
 

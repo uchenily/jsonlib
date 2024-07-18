@@ -151,6 +151,7 @@ class Json {
         // static auto deserialize_from(std::istringstream &in) -> Json {
         static auto deserialize_from(std::string_view in, std::size_t &pos)
             -> Json {
+            eat_whitespace(in, pos);
             switch (in[pos]) {
             case 'n':
                 return deserialize_null(in, pos);
@@ -183,7 +184,8 @@ class Json {
         }
 
     private:
-        static auto eat_whitespace(std::string_view in, std::size_t &pos) {
+        static auto eat_whitespace(std::string_view in, std::size_t &pos)
+            -> void {
             auto length = in.length();
             while (pos < length) {
                 switch (in[pos]) {
@@ -191,6 +193,7 @@ class Json {
                 case '\r':
                 case '\n':
                     pos++;
+                    break;
                 default:
                     return;
                 }
@@ -360,6 +363,7 @@ class Json {
             ASSERT(in[pos] == '{');
             pos++;
             while (in[pos] != '}') {
+                eat_whitespace(in, pos);
                 auto key = deserialize_string(in, pos);
                 ASSERT(in[pos] == ':');
                 pos++;
@@ -373,6 +377,9 @@ class Json {
                 }
                 eat_whitespace(in, pos);
             }
+            // skip '}'
+            ASSERT(in[pos] == '}');
+            pos++;
 
             return ret;
         }

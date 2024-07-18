@@ -70,3 +70,8 @@ A simple JSON parsing header library
 - [ ] error handing
 - [ ] compile time reflection for structs
 - [ ] useful extensions
+
+
+## Try on godbolt
+
+[compiler-explorer](https://godbolt.org/z/EzK96j53E)
